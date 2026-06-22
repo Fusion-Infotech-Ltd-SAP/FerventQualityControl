@@ -1,0 +1,60 @@
+CREATE PROCEDURE FIL_SP_QC_CheckList
+(
+    IN FDT DATE,
+    IN TDT DATE,
+    IN DocumentType  VARCHAR(50),
+    IN ItmsGrpCod VARCHAR(50),
+    IN ItemCode VARCHAR(50),
+    IN BPCardCode VARCHAR(50)
+)
+AS
+	BEGIN
+	    SELECT 
+		'' As "Selected",
+		L."DocEntry",
+		QO."ObjType",
+		L."BASE_REF" AS "DocNum",
+		L."DocDate",
+		I."ItemCode",
+		I."ItemName",
+		L."Quantity"-ifnull(V20."GRPQCQTY",0)-ifnull(V59."PQCQTY",0) "Quantity",
+		W."WhsCode" AS  "QcWarehouse",
+		W."U_SCRAP" AS "ScrapWhsCode",
+		WS."U_REJECT" As "RejectWhs",
+		ifnull(D20."U_WHSCODE",D59."U_WHSCODE") AS "NormalWhsCode",
+		0 AS "Accepted Quantity",
+		0 AS "Rejected Quantity",
+		0 AS "Balance Quantity",
+		'Pending' AS "Status"
+			
+	FROM OILM L 
+	--INNER JOIN ILM1 L1 ON L1."MessageID"=L."MessageID"
+    INNER JOIN OWHS W ON W."WhsCode"= L."LocCode"
+	INNER JOIN OITM I ON I."ItemCode"=L."ItemCode"
+	INNER JOIN "VW_QCDocument" QO ON QO."ObjType"=L."TransType"
+	LEFT OUTER JOIN IGN1 D59 ON D59."ObjType"=L."TransType" AND D59."DocEntry"=L."DocEntry" AND D59."LineNum"=L."DocLineNum"
+	LEFT OUTER JOIN 
+     (SELECT 
+        A."U_BASETYPE",A."U_BASENTRY",A."U_ITEMCODE",SUM(A."U_QCQTY") AS "PQCQTY"
+      FROM "@FIL_DH_INSPDECN" A
+      GROUP BY   A."U_BASETYPE", A."U_BASENTRY", A."U_ITEMCODE"
+       ) V59 ON V59."U_BASETYPE" = D59."ObjType" AND V59."U_BASENTRY" = D59."DocEntry" AND V59."U_ITEMCODE" = L."ItemCode"
+	
+	LEFT OUTER JOIN PDN1 D20 ON D20."ObjType"=L."TransType" AND D20."DocEntry"=L."DocEntry" AND D20."LineNum"=L."DocLineNum"
+	LEFT OUTER JOIN OWHS WS ON WS."WhsCode" = D20."U_WHSCODE"
+    LEFT OUTER JOIN 
+     (SELECT 
+        A."U_BASETYPE",A."U_BASENTRY",A."U_ITEMCODE",SUM(A."U_QCQTY") AS "GRPQCQTY"
+      FROM "@FIL_DH_INSPDECN" A
+      GROUP BY  A."U_BASETYPE",A."U_BASENTRY", A."U_ITEMCODE"
+       ) V20 ON V20."U_BASETYPE" = D20."ObjType" AND V20."U_BASENTRY" = D20."DocEntry" AND V20."U_ITEMCODE" = L."ItemCode"
+	
+	WHERE 
+	  L."DocDate" between FDT and TDT
+	  AND L."LocCode" = (select "WhsCode" from "OWHS" where "U_WHSTYPE"='Q') AND L."LocType"='64' 
+	  AND L."Quantity"-ifnull(V20."GRPQCQTY",0)-ifnull(V59."PQCQTY",0) > 0
+	  AND CASE WHEN IFNULL(DocumentType,'')='' THEN '' ELSE CAST(QO."ObjType" AS VARCHAR) END=CASE WHEN IFNULL(DocumentType,'')='' THEN '' ELSE IFNULL(DocumentType,'') END
+	  AND CASE WHEN IFNULL(ItmsGrpCod,'')='' THEN '' ELSE CAST(I."ItmsGrpCod" AS VARCHAR) END=CASE WHEN IFNULL(ItmsGrpCod,'')='' THEN '' ELSE IFNULL(ItmsGrpCod,'') END
+	  AND CASE WHEN IFNULL(ItemCode,'')='' THEN '' ELSE CAST(I."ItemCode" AS VARCHAR) END=CASE WHEN IFNULL(ItemCode,'')='' THEN '' ELSE IFNULL(ItemCode,'') END
+	  AND CASE WHEN IFNULL(BPCardCode,'')='' THEN '' ELSE CAST(L."BPCardCode" AS VARCHAR) END=CASE WHEN IFNULL(BPCardCode,'')='' THEN '' ELSE IFNULL(BPCardCode,'') END;
+END;

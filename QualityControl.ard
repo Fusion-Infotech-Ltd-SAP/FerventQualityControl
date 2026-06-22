@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AddOnRegData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SlientInstallation="No" SlientUpgrade="No" Partnernmsp="FIL" SchemaVersion="3.0" Type="" MultipleVersion="true" OnDemand="" OnPremise="" ExtName="QC_10.0.0.1" ExtVersion="QC_10.0.0.1" Contdata="" Partner="FIL" DBType="HANA" ClientType="A">
+  <Validity>
+    <SBOCompatibility>
+      <Version From="10.00.240" To="10.00.240" />
+    </SBOCompatibility>
+  </Validity>
+  <Configuration>
+    <Repository>
+      <Properties />
+    </Repository>
+    <Deployment>
+      <Properties />
+    </Deployment>
+    <Assignment>
+      <Properties />
+    </Assignment>
+  </Configuration>
+  <Addons>
+    <Addon Name="" Group="" ForceFlag="" Visible="" AutoAssign="" SelfUpgrd="">
+      <x86 AddonExe="E:\Fusion Office Work\QualityControl\QualityControl\bin\Debug\QualityControl.exe" AddonSig="" AddonSigSha256="">
+        <Installation>
+          <Files>
+            <File FileName="QualityControl.exe">
+              <Actions />
+            </File>
+          </Files>
+        </Installation>
+        <Uninstallation>
+          <Files>
+            <File FileName="QualityControl.exe">
+              <Actions />
+            </File>
+          </Files>
+        </Uninstallation>
+      </x86>
+      <x64 AddonExe="E:\Fusion Office Work\QualityControl\QualityControl\bin\Debug\QualityControl.exe" AddonSig="" AddonSigSha256="">
+        <Installation>
+          <Files>
+            <File FileName="QualityControl.b1s">
+              <Actions />
+            </File>
+            <File FileName="QualityControl.exe">
+              <Actions />
+            </File>
+            <File FileName="QualityControl.pdb">
+              <Actions />
+            </File>
+            <File FileName="SAPBusinessOneSDK.dll">
+              <Actions />
+            </File>
+          </Files>
+        </Installation>
+        <Uninstallation>
+          <Files>
+            <File FileName="QualityControl.b1s">
+              <Actions />
+            </File>
+            <File FileName="QualityControl.exe">
+              <Actions />
+            </File>
+            <File FileName="QualityControl.pdb">
+              <Actions />
+            </File>
+            <File FileName="SAPBusinessOneSDK.dll">
+              <Actions />
+            </File>
+          </Files>
+        </Uninstallation>
+      </x64>
+    </Addon>
+  </Addons>
+  <XApps>
+    <XApp Name="" Path="" FileName="" />
+  </XApps>
+  <UDQs>
+    <UDQ udqname="">
+      <Hana FileName="" />
+    </UDQ>
+  </UDQs>
+</AddOnRegData>

@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2EF9CD1C-B807-4FEE-9046-2153F0916B79}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>QualityControl</RootNamespace>
+    <AssemblyName>QualityControl</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>QualityControl.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="SAPBusinessOneSDK" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Global.cs" />
+    <Compile Include="GlobalFunction.cs" />
+    <Compile Include="Helper\FileDialogHelper.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Form_NO_IPndList.b1f.cs">
+      <DependentUpon>Form_NO_IPndList.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Form_SYS_GRPO.cs" />
+    <Compile Include="Resources\Form_SYS_ReceiptFromProduction.cs" />
+    <Compile Include="Resources\Form_SYS_WarehouseMaster.cs" />
+    <Compile Include="Resources\Form_UDO_InspectionCheckSelection.b1f.cs">
+      <DependentUpon>Form_UDO_InspectionCheckSelection.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Form_UDO_InspectionDecision.b1f.cs">
+      <DependentUpon>Form_UDO_InspectionDecision.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Form_UDO_InspectionParam.b1f.cs">
+      <DependentUpon>Form_UDO_InspectionParam.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Form_UDO_QualityInspection.b1f.cs">
+      <DependentUpon>Form_UDO_QualityInspection.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\From_UDO_CharacteristicMasterGroup.b1f.cs">
+      <DependentUpon>From_UDO_CharacteristicMasterGroup.b1f</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\TransferPendingList.b1f.cs">
+      <DependentUpon>TransferPendingList.b1f</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utility\HANA\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Form_NO_IPndList.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Form_UDO_InspectionCheckSelection.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Form_UDO_InspectionDecision.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Form_UDO_InspectionParam.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\Form_UDO_QualityInspection.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\From_UDO_CharacteristicMasterGroup.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+    <None Include="Resources\TransferPendingList.b1f">
+      <FormCategory>UserForm</FormCategory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
