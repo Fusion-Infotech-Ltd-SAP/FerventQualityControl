@@ -47,6 +47,7 @@ namespace QualityControl.Resources
             this.ETCHRGNAME = ((SAPbouiCOM.EditText)(this.GetItem("ETCHRGNAME").Specific));
             this.ETDOCENTRY = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCENTRY").Specific));
             this.CBITMGRPCD = ((SAPbouiCOM.ComboBox)(this.GetItem("CBITMGRPCD").Specific));
+            this.CBITMGRPCD.ComboSelectAfter += new SAPbouiCOM._IComboBoxEvents_ComboSelectAfterEventHandler(this.CBITMGRPCD_ComboSelectAfter);
             this.CBACTIVE = ((SAPbouiCOM.CheckBox)(this.GetItem("CBACTIVE").Specific));
             this.CBSUBGRP = ((SAPbouiCOM.ComboBox)(this.GetItem("CBSUBGRP").Specific));
             this.CBHICKNSS = ((SAPbouiCOM.ComboBox)(this.GetItem("CBHICKNSS").Specific));
@@ -65,6 +66,29 @@ namespace QualityControl.Resources
             }
 
             
+        }
+
+        private void CBITMGRPCD_ComboSelectAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oform = Application.SBO_Application.Forms.Item("FIL_FRM_MH_INSPLAN");
+                SAPbouiCOM.Matrix MTX03 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX03").Specific;
+                SAPbouiCOM.DBDataSource DBDataSourceLine =
+                    oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
+
+                if (MTX03.RowCount == 0)
+                {
+                    Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error);
+            }
         }
 
         public override void OnInitializeFormEvents()
@@ -487,76 +511,75 @@ namespace QualityControl.Resources
             //oForm.Freeze(false);
             pForm.Freeze(false);
         }
+
+
         private void TAB2_ClickAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
-
             SAPbouiCOM.Form oform = Application.SBO_Application.Forms.Item("FIL_FRM_MH_INSPLAN");
-            SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNDC");
-            if(oform.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
+            SAPbouiCOM.DBDataSource DBDataSourceLine =  oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNDC");
+
+            SAPbouiCOM.Matrix MTX02 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX02").Specific;
+
+            try
             {
-                try
+                oform.Freeze(true);
+
+                if (oform.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                 {
-                  //  oform.Freeze(true);
-                    string strqry = string.Format("SELECT A.{0}DocumentType{0},A.{0}Description{0},A.{0}ObjType{0},A.{0}BaseType{0}  from {0}VW_QCDocument{0} A", '"');
-
-                    SAPbouiCOM.Matrix MTX02 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX02").Specific;
-
+                    if (MTX02.RowCount > 0)
+                    {
+                        oform.Freeze(false);
+                        return;
+                    }
+                    string strqry = string.Format("SELECT A.{0}DocumentType{0}, A.{0}Description{0}, A.{0}ObjType{0}, A.{0}BaseType{0} FROM {0}VW_QCDocument{0} A",'"');
                     SAPbobsCOM.Recordset ors = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                     ors.DoQuery(strqry);
 
-                    MTX02.FlushToDataSource(); // move the data from matrix to dbdatasource
-                    MTX02.Clear();// clear or remove from matrix
-                    DBDataSourceLine.Clear(); // clear or remove from dbdatasource(in backend table)
-                    for (int irow = 1; irow <= ors.RecordCount; irow++) //ToString load a data from record set to dbdatasource
+                    DBDataSourceLine.Clear();
+
+                    int row = 0;
+
+                    while (!ors.EoF)
                     {
-                        DBDataSourceLine.InsertRecord(irow - 1);
-                        DBDataSourceLine.SetValue("LineId", irow - 1, irow.ToString());
-                        DBDataSourceLine.SetValue("U_DSCRPTN", irow - 1, ors.Fields.Item("Description").Value.ToString());
-                        DBDataSourceLine.SetValue("U_DOCTYPE", irow - 1, ors.Fields.Item("DocumentType").Value.ToString());
-                        DBDataSourceLine.SetValue("U_OBJTYPE", irow - 1, ors.Fields.Item("ObjType").Value.ToString());
-                        DBDataSourceLine.SetValue("U_BASETYPE", irow - 1, ors.Fields.Item("BaseType").Value.ToString());
-                      //  DBDataSourceLine.SetValue("U_ACTIVE", irow - 1, irow.ToString());
-                        //to move recordset
+                        DBDataSourceLine.InsertRecord(row);
+
+                        DBDataSourceLine.SetValue("LineId", row, (row + 1).ToString());
+                        DBDataSourceLine.SetValue("U_DSCRPTN", row, ors.Fields.Item("Description").Value.ToString());
+                        DBDataSourceLine.SetValue("U_DOCTYPE", row, ors.Fields.Item("DocumentType").Value.ToString());
+                        DBDataSourceLine.SetValue("U_OBJTYPE", row, ors.Fields.Item("ObjType").Value.ToString());
+                        DBDataSourceLine.SetValue("U_BASETYPE", row, ors.Fields.Item("BaseType").Value.ToString());
+                       // DBDataSourceLine.SetValue("U_ACTIVE", row, "Y");
+
+                        row++;
                         ors.MoveNext();
                     }
+
                     MTX02.LoadFromDataSource();
                     MTX02.AutoResizeColumns();
-
-                   // oform.Freeze(false);
                 }
-
-                catch(Exception ex)
+                else
                 {
-                    oform.Freeze(false);
-                }
-                
-            }
+                    SAPbouiCOM.DBDataSource oDBHeader =
+                        oform.DataSources.DBDataSources.Item("@FIL_MH_INPLAN");
 
-            else
-            {
-                try
-                {
-                    oform.Freeze(true);
-
-                    SAPbouiCOM.Matrix MTX02 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX02").Specific;
-                    SAPbouiCOM.DBDataSource oDBHeader = oform.DataSources.DBDataSources.Item("@FIL_MH_INPLAN");
                     string DocEntry = oDBHeader.GetValue("DocEntry", 0).Trim();
 
                     DBDataSourceLine.Clear();
 
                     string strqry = @"
-                                SELECT 
-                                    ""LineId"",
-                                    ""U_DSCRPTN"",
-                                    ""U_DOCTYPE"",
-                                    ""U_OBJTYPE"",
-                                    ""U_BASETYPE"",
-                                     ""U_ACTIVE""
-                                FROM ""@FIL_MR_INPLNDC""
-                                WHERE ""DocEntry"" = '" + DocEntry + @"'
-                                ORDER BY ""LineId""";
+                            SELECT 
+                                ""LineId"",
+                                ""U_DSCRPTN"",
+                                ""U_DOCTYPE"",
+                                ""U_OBJTYPE"",
+                                ""U_BASETYPE"",
+                                ""U_ACTIVE""
+                            FROM ""@FIL_MR_INPLNDC""
+                            WHERE ""DocEntry"" = '" + DocEntry + @"'
+                            ORDER BY ""LineId""";
 
-                    SAPbobsCOM.Recordset ors = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                    SAPbobsCOM.Recordset ors =
+                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
                     ors.DoQuery(strqry);
 
@@ -579,57 +602,20 @@ namespace QualityControl.Resources
 
                     MTX02.LoadFromDataSource();
                     MTX02.AutoResizeColumns();
-
-                    oform.Freeze(false);
-                }
-                catch (Exception ex)
-                {
-                    oform.Freeze(false);
-                   
                 }
             }
-
-            //else 
-            //{
-            //    try
-            //    {
-            //       // oform.Freeze(true);
-            //        SAPbouiCOM.Matrix MTX02 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX02").Specific;
-            //        if (MTX02.RowCount == 0)
-            //        {
-            //            string strqry = string.Format("SELECT A.{0}DocumentType{0},A.{0}Description{0},A.{0}ObjType{0},A.{0}BaseType{0}  from {0}VW_QCDocument{0} A", '"');
-
-            //            SAPbobsCOM.Recordset ors = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-            //            ors.DoQuery(strqry);
-
-            //            MTX02.FlushToDataSource(); // move the data from matrix to dbdatasource
-            //            MTX02.Clear();// clear or remove from matrix
-            //            DBDataSourceLine.Clear(); // clear or remove from dbdatasource(in backend table)
-            //            for (int irow = 1; irow <= ors.RecordCount; irow++) //ToString load a data from record set to dbdatasource
-            //            {
-            //                DBDataSourceLine.InsertRecord(irow - 1);
-            //                DBDataSourceLine.SetValue("LineId", irow - 1, irow.ToString());
-            //                DBDataSourceLine.SetValue("U_DSCRPTN", irow - 1, ors.Fields.Item("Description").Value.ToString());
-            //                DBDataSourceLine.SetValue("U_DOCTYPE", irow - 1, ors.Fields.Item("DocumentType").Value.ToString());
-            //                DBDataSourceLine.SetValue("U_OBJTYPE", irow - 1, ors.Fields.Item("ObjType").Value.ToString());
-            //                DBDataSourceLine.SetValue("U_BASETYPE", irow - 1, ors.Fields.Item("BaseType").Value.ToString());
-            //               // DBDataSourceLine.SetValue("U_ACTIVE", irow - 1, irow.ToString());
-
-            //                //to move recordset
-            //                ors.MoveNext();
-            //            }
-            //            MTX02.LoadFromDataSource();
-            //            MTX02.AutoResizeColumns();
-            //        }
-            //       // oform.Freeze(false);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        oform.Freeze(false);
-            //    }
-
-            //}
-
+            catch (Exception ex)
+            {
+                Application.SBO_Application.StatusBar.SetText(
+                    ex.Message,
+                    SAPbouiCOM.BoMessageTime.bmt_Short,
+                    SAPbouiCOM.BoStatusBarMessageType.smt_Error
+                );
+            }
+            finally
+            {
+                oform.Freeze(false);
+            }
         }
 
     }
