@@ -125,16 +125,16 @@ namespace QualityControl
                     }
                     oform.Items.Item("CBHICKNSS").Enabled = true;
                     string qStr2 = "";
-                   //   qStr2 = string.Format("SELECT distinct {0}U_Thickness{0}  FROM {0}OITM{0}", '"');
+                  //  qStr2 = string.Format("SELECT distinct {0}U_Thickness{0}  FROM {0}OITM{0}", '"');
                     //Fervent
-                     qStr2 = string.Format("SELECT distinct {0}U_THICKNESS{0}  FROM {0}OITM{0}", '"');
+                    qStr2 = string.Format("SELECT distinct {0}U_THICKNESS{0}  FROM {0}OITM{0}", '"');
                     
                     rSet.DoQuery(qStr2);
                     while (!rSet.EoF)
                     {
-                      //  ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_Thickness").Value.ToString(), rSet.Fields.Item("U_Thickness").Value.ToString());
+                     // ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_Thickness").Value.ToString(), rSet.Fields.Item("U_Thickness").Value.ToString());
                         //Fervent
-                      ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_THICKNESS").Value.ToString(), rSet.Fields.Item("U_THICKNESS").Value.ToString());
+                     ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_THICKNESS").Value.ToString(), rSet.Fields.Item("U_THICKNESS").Value.ToString());
                         rSet.MoveNext();
                     }
 

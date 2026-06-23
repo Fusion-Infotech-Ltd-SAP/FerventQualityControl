@@ -559,49 +559,48 @@ namespace QualityControl.Resources
                 }
                 else
                 {
-                    SAPbouiCOM.DBDataSource oDBHeader =
-                        oform.DataSources.DBDataSources.Item("@FIL_MH_INPLAN");
+                    //SAPbouiCOM.DBDataSource oDBHeader = oform.DataSources.DBDataSources.Item("@FIL_MH_INPLAN");
 
-                    string DocEntry = oDBHeader.GetValue("DocEntry", 0).Trim();
+                    //string DocEntry = oDBHeader.GetValue("DocEntry", 0).Trim();
 
-                    DBDataSourceLine.Clear();
+                    //DBDataSourceLine.Clear();
 
-                    string strqry = @"
-                            SELECT 
-                                ""LineId"",
-                                ""U_DSCRPTN"",
-                                ""U_DOCTYPE"",
-                                ""U_OBJTYPE"",
-                                ""U_BASETYPE"",
-                                ""U_ACTIVE""
-                            FROM ""@FIL_MR_INPLNDC""
-                            WHERE ""DocEntry"" = '" + DocEntry + @"'
-                            ORDER BY ""LineId""";
+                    //string strqry = @"
+                    //        SELECT 
+                    //            ""LineId"",
+                    //            ""U_DSCRPTN"",
+                    //            ""U_DOCTYPE"",
+                    //            ""U_OBJTYPE"",
+                    //            ""U_BASETYPE"",
+                    //            ""U_ACTIVE""
+                    //        FROM ""@FIL_MR_INPLNDC""
+                    //        WHERE ""Code"" = '" + DocEntry + @"'
+                    //        ORDER BY ""LineId""";
 
-                    SAPbobsCOM.Recordset ors =
-                        (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                    //SAPbobsCOM.Recordset ors =
+                    //    (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
-                    ors.DoQuery(strqry);
+                    //ors.DoQuery(strqry);
 
-                    int row = 0;
+                    //int row = 0;
 
-                    while (!ors.EoF)
-                    {
-                        DBDataSourceLine.InsertRecord(row);
+                    //while (!ors.EoF)
+                    //{
+                    //    DBDataSourceLine.InsertRecord(row);
 
-                        DBDataSourceLine.SetValue("LineId", row, ors.Fields.Item("LineId").Value.ToString());
-                        DBDataSourceLine.SetValue("U_DSCRPTN", row, ors.Fields.Item("U_DSCRPTN").Value.ToString());
-                        DBDataSourceLine.SetValue("U_DOCTYPE", row, ors.Fields.Item("U_DOCTYPE").Value.ToString());
-                        DBDataSourceLine.SetValue("U_OBJTYPE", row, ors.Fields.Item("U_OBJTYPE").Value.ToString());
-                        DBDataSourceLine.SetValue("U_BASETYPE", row, ors.Fields.Item("U_BASETYPE").Value.ToString());
-                        DBDataSourceLine.SetValue("U_ACTIVE", row, ors.Fields.Item("U_ACTIVE").Value.ToString());
+                    //    DBDataSourceLine.SetValue("LineId", row, ors.Fields.Item("LineId").Value.ToString());
+                    //    DBDataSourceLine.SetValue("U_DSCRPTN", row, ors.Fields.Item("U_DSCRPTN").Value.ToString());
+                    //    DBDataSourceLine.SetValue("U_DOCTYPE", row, ors.Fields.Item("U_DOCTYPE").Value.ToString());
+                    //    DBDataSourceLine.SetValue("U_OBJTYPE", row, ors.Fields.Item("U_OBJTYPE").Value.ToString());
+                    //    DBDataSourceLine.SetValue("U_BASETYPE", row, ors.Fields.Item("U_BASETYPE").Value.ToString());
+                    //    DBDataSourceLine.SetValue("U_ACTIVE", row, ors.Fields.Item("U_ACTIVE").Value.ToString());
 
-                        row++;
-                        ors.MoveNext();
-                    }
+                    //    row++;
+                    //    ors.MoveNext();
+                    //}
 
-                    MTX02.LoadFromDataSource();
-                    MTX02.AutoResizeColumns();
+                    //MTX02.LoadFromDataSource();
+                    //MTX02.AutoResizeColumns();
                 }
             }
             catch (Exception ex)
