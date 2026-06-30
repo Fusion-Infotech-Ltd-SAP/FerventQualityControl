@@ -107,7 +107,7 @@ namespace QualityControl
                     oform.Items.Item("CBITMGRPCD").Enabled = true;
 
                     SAPbobsCOM.Recordset rSet = (SAPbobsCOM.Recordset)Global.oComp.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                    qStr = string.Format("SELECT {0}ItmsGrpCod{0},{0}ItmsGrpNam{0}  FROM {0}OITB{0}", '"');
+                    qStr = string.Format("SELECT {0}ItmsGrpCod{0}, {0}ItmsGrpNam{0} FROM {0}OITB{0} ORDER BY {0}ItmsGrpCod{0}",'"');
                     rSet.DoQuery(qStr);
                     while (!rSet.EoF)
                     {
@@ -125,24 +125,24 @@ namespace QualityControl
                     }
                     oform.Items.Item("CBHICKNSS").Enabled = true;
                     string qStr2 = "";
-                    //qStr2 = string.Format("SELECT distinct {0}U_Thickness{0}  FROM {0}OITM{0}", '"');
+                  //  qStr2 = string.Format("SELECT distinct {0}U_Thickness{0}  FROM {0}OITM{0}", '"');
                     //Fervent
                     qStr2 = string.Format("SELECT distinct {0}U_THICKNESS{0}  FROM {0}OITM{0}", '"');
                     
                     rSet.DoQuery(qStr2);
                     while (!rSet.EoF)
                     {
-                       // ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_Thickness").Value.ToString(), rSet.Fields.Item("U_Thickness").Value.ToString());
+                     // ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_Thickness").Value.ToString(), rSet.Fields.Item("U_Thickness").Value.ToString());
                         //Fervent
-                      ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_THICKNESS").Value.ToString(), rSet.Fields.Item("U_THICKNESS").Value.ToString());
+                     ((SAPbouiCOM.ComboBox)oform.Items.Item("CBHICKNSS").Specific).ValidValues.Add(rSet.Fields.Item("U_THICKNESS").Value.ToString(), rSet.Fields.Item("U_THICKNESS").Value.ToString());
                         rSet.MoveNext();
                     }
 
 
                     oform.Items.Item("TAB3").Click();
                     SAPbouiCOM.Matrix MTX03 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX03").Specific;
-                    SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
-                    Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
+                    //SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
+                    //Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
                     oform.Items.Item("TAB1").Click();
 
 
@@ -239,12 +239,13 @@ namespace QualityControl
                     {
                         if (oform.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oform.Items.Item("CBSERIES").Specific;                                                                         //1 step do generate series:
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_INSPDECN");
-                            string oComValue = ocmb.Selected.Value;
-                            long DocNo = oform.BusinessObject.GetNextSerialNumber(oComValue, "FIL_D_INSPDECN");
+                            Global.GFunc.LoadSeriesAndSetDocNum(oform, "CBSERIES", "FIL_D_INSPDECN", "@FIL_DH_INSPDECN");
+                            //SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oform.Items.Item("CBSERIES").Specific;                                                                         //1 step do generate series:
+                            //Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_INSPDECN");
+                            //string oComValue = ocmb.Selected.Value;
+                            //long DocNo = oform.BusinessObject.GetNextSerialNumber(oComValue, "FIL_D_INSPDECN");
 
-                            oform.DataSources.DBDataSources.Item("@FIL_DH_INSPDECN").SetValue("DocNum", 0, DocNo.ToString());
+                            //oform.DataSources.DBDataSources.Item("@FIL_DH_INSPDECN").SetValue("DocNum", 0, DocNo.ToString());
                         }
                         oform.Items.Item("BTSTKTRNS").Visible = false;
                         //Current Date
@@ -353,8 +354,8 @@ namespace QualityControl
                                 //}
                                 oform.Items.Item("TAB3").Click();
                                 SAPbouiCOM.Matrix MTX03 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX03").Specific;
-                                SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
-                                Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
+                                //SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
+                                //Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
                                 oform.Items.Item("TAB1").Click();
                                 break;
                             }

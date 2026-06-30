@@ -24,44 +24,55 @@ namespace QualityControl.Resources
                 {
                     SAPbouiCOM.Form oform = Application.SBO_Application.Forms.GetFormByTypeAndCount(pVal.FormType, pVal.FormTypeCount);
 
-                    if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_COMBO_SELECT && pVal.ActionSuccess)
-                    {
-                        // Assuming 'oform' is your SAPbouiCOM.Form object
-                        //SAPbouiCOM.Item GlnStatic = oform.Items.Item("1470002039");
-                        //SAPbouiCOM.Item GlnEditText = oform.Items.Item("1470002038");
-                    }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_FORM_ACTIVATE && pVal.BeforeAction == false)
+                  
+                    if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_FORM_ACTIVATE && pVal.BeforeAction == false)
                     {
                         SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.GetFormByTypeAndCount(pVal.FormType, pVal.FormTypeCount);
 
-                        oForm.Freeze(true);
+                        // only PaneLevel 1
+                        if (oForm.PaneLevel != 1)
+                            return;
 
-                        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oform.Items.Item("38").Specific;
-
-                        for (int i = 1; i < oMatrix.VisualRowCount; i++)
+                        try
                         {
-                            ProcessChooseFormListAndTab(oMatrix, i);
-                        }
+                            oForm.Freeze(true);
 
-                        oForm.Freeze(false);
+                            SAPbouiCOM.Matrix oMatrix =(SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+
+                            for (int i = 1; i <= oMatrix.VisualRowCount; i++)
+                            {
+                                ProcessChooseFormListAndTab(oMatrix, i);
+                            }
+                        }
+                        finally
+                        {
+                            oForm.Freeze(false);
+                        }
                     }
-                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_KEY_DOWN
-                        && pVal.BeforeAction == false
-                        && pVal.CharPressed == 9) // TAB key
+
+                    else if (pVal.EventType == SAPbouiCOM.BoEventTypes.et_KEY_DOWN && pVal.BeforeAction == false && pVal.CharPressed == 9)
                     {
                         if (pVal.ItemUID == "38" && pVal.Row > 0)
                         {
                             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.GetFormByTypeAndCount(pVal.FormType, pVal.FormTypeCount);
 
-                            oForm.Freeze(true);
+                            if (oForm.PaneLevel != 1)
+                                return;
 
-                            SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oform.Items.Item("38").Specific;
+                            try
+                            {
+                                oForm.Freeze(true);
 
-                            ProcessChooseFormListAndTab(oMatrix, pVal.Row);
-
-                            oForm.Freeze(false);
+                                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oForm.Items.Item("38").Specific;
+                                ProcessChooseFormListAndTab(oMatrix, pVal.Row);
+                            }
+                            finally
+                            {
+                                oForm.Freeze(false);
+                            }
                         }
                     }
+
                 }
             }
             catch (Exception ex)
