@@ -200,10 +200,10 @@ namespace QualityControl.Resources
 
         private void ETDOCDATE_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
+            SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
             try
             {
-                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
-
+                oForm.Freeze(true);
                 DateTime postDate = DateTime.ParseExact(((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDATE").Specific).Value, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
 
                 if (!Global.GFunc.LoadSeriesAndSetDocNum(oForm, "CBSERIES", "FIL_D_INSPDECN", "@FIL_DH_INSPDECN", postDate))
@@ -213,8 +213,12 @@ namespace QualityControl.Resources
             }
             catch (Exception ex)
             {
+                Application.SBO_Application.MessageBox("Error: " + ex.Message);
             }
-
+            finally
+            {
+                oForm.Freeze(false);
+            }
 
         }
 
