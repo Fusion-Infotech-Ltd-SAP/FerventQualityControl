@@ -54,6 +54,7 @@ namespace QualityControl.Resources
             this.ETQCQTY.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETQCQTY_LostFocusAfter);
             this.STDOCDATE = ((SAPbouiCOM.StaticText)(this.GetItem("STDOCDATE").Specific));
             this.ETDOCDATE = ((SAPbouiCOM.EditText)(this.GetItem("ETDOCDATE").Specific));
+            this.ETDOCDATE.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETDOCDATE_LostFocusAfter);
             this.STTRNSFRNM = ((SAPbouiCOM.StaticText)(this.GetItem("STTRNSFRNM").Specific));
             this.ETTRNSFRID = ((SAPbouiCOM.EditText)(this.GetItem("ETTRNSFRID").Specific));
             this.ETTRNSFRNM = ((SAPbouiCOM.EditText)(this.GetItem("ETTRNSFRNM").Specific));
@@ -109,7 +110,7 @@ namespace QualityControl.Resources
             this.STACPTWHS = ((SAPbouiCOM.StaticText)(this.GetItem("STACPTWHS").Specific));
             this.STGRDDWHS = ((SAPbouiCOM.StaticText)(this.GetItem("STGRDDWHS").Specific));
             this.STGRDEWHS = ((SAPbouiCOM.StaticText)(this.GetItem("STGRDEWHS").Specific));
-            //                           this.ETGRDBWHS.KeyDownAfter += new SAPbouiCOM._IEditTextEvents_KeyDownAfterEventHandler(this.ETGRDBWHS_KeyDownAfter);
+            //                            this.ETGRDBWHS.KeyDownAfter += new SAPbouiCOM._IEditTextEvents_KeyDownAfterEventHandler(this.ETGRDBWHS_KeyDownAfter);
             this.STSCRPQTY = ((SAPbouiCOM.StaticText)(this.GetItem("STSCRPQTY").Specific));
             this.ETSCRPQTY = ((SAPbouiCOM.EditText)(this.GetItem("ETSCRPQTY").Specific));
             this.ETSCRPQTY.LostFocusAfter += new SAPbouiCOM._IEditTextEvents_LostFocusAfterEventHandler(this.ETSCRPQTY_LostFocusAfter);
@@ -194,6 +195,26 @@ namespace QualityControl.Resources
 
         private void OnCustomInitialize()
         {
+
+        }
+
+        private void ETDOCDATE_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
+        {
+            try
+            {
+                SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item(pVal.FormUID);
+
+                DateTime postDate = DateTime.ParseExact(((SAPbouiCOM.EditText)oForm.Items.Item("ETDOCDATE").Specific).Value, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+
+                if (!Global.GFunc.LoadSeriesAndSetDocNum(oForm, "CBSERIES", "FIL_D_INSPDECN", "@FIL_DH_INSPDECN", postDate))
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
 
         }
 
@@ -390,12 +411,7 @@ namespace QualityControl.Resources
                 if (pForm.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                 {
                     pForm.Items.Item("TAB01").Click();
-                    SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)pForm.Items.Item("CBSERIES").Specific;                                                                         //1 step do generate series:
-                    Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_INSPDECN");
-                    string oComValue = ocmb.Selected.Value;
-                    long DocNo = pForm.BusinessObject.GetNextSerialNumber(oComValue, "FIL_D_INSPDECN");
-
-                    pForm.DataSources.DBDataSources.Item("@FIL_DH_INSPDECN").SetValue("DocNum", 0, DocNo.ToString());
+                    Global.GFunc.LoadSeriesAndSetDocNum(pForm, "CBSERIES", "FIL_D_INSPDECN", "@FIL_DH_INSPDECN");
                 }
 
                 //Current Date
@@ -747,6 +763,8 @@ namespace QualityControl.Resources
             }
 
         }
+
+       
 
         private void ETGRDCQTY_LostFocusAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {

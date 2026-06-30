@@ -239,12 +239,13 @@ namespace QualityControl
                     {
                         if (oform.Mode == SAPbouiCOM.BoFormMode.fm_ADD_MODE)
                         {
-                            SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oform.Items.Item("CBSERIES").Specific;                                                                         //1 step do generate series:
-                            Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_INSPDECN");
-                            string oComValue = ocmb.Selected.Value;
-                            long DocNo = oform.BusinessObject.GetNextSerialNumber(oComValue, "FIL_D_INSPDECN");
+                            Global.GFunc.LoadSeriesAndSetDocNum(oform, "CBSERIES", "FIL_D_INSPDECN", "@FIL_DH_INSPDECN");
+                            //SAPbouiCOM.ComboBox ocmb = (SAPbouiCOM.ComboBox)oform.Items.Item("CBSERIES").Specific;                                                                         //1 step do generate series:
+                            //Global.GFunc.LoadComboBoxSeries(ocmb, "FIL_D_INSPDECN");
+                            //string oComValue = ocmb.Selected.Value;
+                            //long DocNo = oform.BusinessObject.GetNextSerialNumber(oComValue, "FIL_D_INSPDECN");
 
-                            oform.DataSources.DBDataSources.Item("@FIL_DH_INSPDECN").SetValue("DocNum", 0, DocNo.ToString());
+                            //oform.DataSources.DBDataSources.Item("@FIL_DH_INSPDECN").SetValue("DocNum", 0, DocNo.ToString());
                         }
                         oform.Items.Item("BTSTKTRNS").Visible = false;
                         //Current Date
