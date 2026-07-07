@@ -130,7 +130,7 @@ namespace QualityControl.Resources
             catch (Exception ex)
             {
                 ValidatioStart = false;
-                Global.GFunc.ShowError("Error in Itemevent for SAP Screen - " + ex.ToString());
+               // Global.GFunc.ShowError("Error in Itemevent for SAP Screen - " + ex.ToString());
             }
         }
 
