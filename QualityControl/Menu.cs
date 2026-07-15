@@ -1,4 +1,5 @@
-﻿using QualityControl.Resources;
+﻿using QualityControl.Helper;
+using QualityControl.Resources;
 using SAPbouiCOM.Framework;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace QualityControl
         public void BasicStart()
         {
             CompanyConnection(); //1)Company connection 
+            PermissionInstaller.Install();
             CreateMainMenu("43520", "FIL_MN_QC", "Quality Control", 15, 2, false);//parent 2 step
             //CreateMainMenu("FIL_MN_TARGET", "FIL_MASTER", "Master", 0, 2, false);
             //String Menu
@@ -29,6 +31,18 @@ namespace QualityControl
 
             try
             {
+                if (pVal.BeforeAction && !FormAuthorizationHelper.CanOpenMenu(pVal.MenuUID))
+                {
+                    BubbleEvent = false;
+                    return;
+                }
+
+                //if (pVal.BeforeAction && !CheckSystemMenuAuthorization(pVal.MenuUID))
+                //{
+                //    BubbleEvent = false;
+                //    return;
+                //}
+
                 if (pVal.BeforeAction && pVal.MenuUID == "FIL_QINSPMAS")
                 {
                     string formUID = "FIL_FRM_MH_QINSPMAS"; // Unique ID for the form
@@ -46,6 +60,7 @@ namespace QualityControl
                     oform.Items.Item("ETCODE").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, (int)SAPbouiCOM.BoAutoFormMode.afm_Add, SAPbouiCOM.BoModeVisualBehavior.mvb_False);
                     oform.Items.Item("ETCODE").SetAutoManagedAttribute(SAPbouiCOM.BoAutoManagedAttr.ama_Editable, (int)SAPbouiCOM.BoAutoFormMode.afm_Find, SAPbouiCOM.BoModeVisualBehavior.mvb_True);
                     SetNextCode(oform, "ETCODE", "FIL_MH_QINSPMAS");
+                    FormAuthorizationHelper.ApplyReadOnly(oform, PermissionConstants.InspectionParameter);
                 }
                
                 else if (pVal.BeforeAction && pVal.MenuUID == "FIL_CHARMGRPS")
@@ -84,6 +99,7 @@ namespace QualityControl
                     }
 
                     oform.Freeze(false);
+                    FormAuthorizationHelper.ApplyReadOnly(oform, PermissionConstants.CharacteristicGroup);
 
                 }
 
@@ -144,6 +160,7 @@ namespace QualityControl
                     //SAPbouiCOM.DBDataSource DBDataSourceLine = (SAPbouiCOM.DBDataSource)oform.DataSources.DBDataSources.Item("@FIL_MR_INPLNIM");
                     //Global.GFunc.SetNewLineForEditText(MTX03, DBDataSourceLine, 1, "");
                     oform.Items.Item("TAB1").Click();
+                    FormAuthorizationHelper.ApplyReadOnly(oform, PermissionConstants.InspectionPlan);
 
 
                 }
@@ -180,6 +197,7 @@ namespace QualityControl
                         ((SAPbouiCOM.ComboBox)oform.Items.Item("CBDOCTYPE").Specific).ValidValues.Add(rSet.Fields.Item("ObjType").Value.ToString(), rSet.Fields.Item("Description").Value.ToString());
                         rSet.MoveNext();
                     }
+                    FormAuthorizationHelper.ApplyReadOnly(oform, PermissionConstants.CheckSelection);
                 }
 
 
@@ -198,6 +216,7 @@ namespace QualityControl
                     activeForm.Show();
 
                     activeForm.loadPendingList();
+                    FormAuthorizationHelper.ApplyReadOnly(Application.SBO_Application.Forms.Item("FIL_FRM_MH_PNDLIST"), PermissionConstants.PendingList);
 
                     //string qStr = "";
                     //SAPbouiCOM.Form oform = (SAPbouiCOM.Form)Application.SBO_Application.Forms.Item("FIL_FRM_MH_CHKSLC");
@@ -255,6 +274,7 @@ namespace QualityControl
 
                         SAPbouiCOM.Matrix MTX01 = (SAPbouiCOM.Matrix)oform.Items.Item("MTX01").Specific;
                         MTX01.AutoResizeColumns();//define matrix
+                        FormAuthorizationHelper.ApplyReadOnly(oform, PermissionConstants.InspectionDecision);
                     }
 
                     catch (Exception EX)
@@ -268,6 +288,8 @@ namespace QualityControl
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1293")
                 {
                     SAPbouiCOM.Form pForm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.ActiveForm;
+                    if (!AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(pForm.UniqueID), pForm.Title))
+                        return;
                     string formtype = pForm.UniqueID.ToString();
                     
                     switch (formtype)
@@ -322,6 +344,8 @@ namespace QualityControl
                 else if (!pVal.BeforeAction && pVal.MenuUID == "1282")
                 {
                     SAPbouiCOM.Form ofrm = (SAPbouiCOM.Form)Application.SBO_Application.Forms.ActiveForm;
+                    if (!AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(ofrm.UniqueID), ofrm.Title))
+                        return;
                     string formtype = ofrm.UniqueID.ToString();
                     switch (formtype)
                     {
@@ -489,6 +513,8 @@ namespace QualityControl
                 else if (!pVal.BeforeAction && pVal.MenuUID == "FIL_DUPL")
                 {
                     SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.ActiveForm;
+                    if (!AuthorizationService.EnsureFull(PermissionConstants.CharacteristicGroup, "Characteristic Master Group"))
+                        return;
 
                     if (oForm.UniqueID == "FIL_FRM_MH_CHARMGRPS")
                     {
@@ -649,6 +675,44 @@ namespace QualityControl
 
             }
         }
+
+        //private bool CheckSystemMenuAuthorization(string menuUid)
+        //{
+        //    SAPbouiCOM.Form form = null;
+
+        //    try
+        //    {
+        //        form = Application.SBO_Application.Forms.ActiveForm;
+        //    }
+        //    catch
+        //    {
+        //        return true;
+        //    }
+
+        //    string formUid = form.UniqueID;
+
+        //    if (!FormAuthorizationHelper.IsConfigurationForm(formUid) &&
+        //        !FormAuthorizationHelper.IsInspectionForm(formUid) &&
+        //        !FormAuthorizationHelper.IsReportForm(formUid))
+        //        return true;
+
+        //    if (menuUid == "1282")
+        //        return AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(formUid), form.Title);
+
+        //    if (menuUid == "1283" || menuUid == "1284")
+        //        return AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(formUid), form.Title);
+
+        //    if (menuUid == "1293")
+        //        return AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(formUid), form.Title);
+
+        //    if (menuUid == "519")
+        //        return AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(formUid), form.Title);
+
+        //    if (menuUid == "7169")
+        //        return AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(formUid), form.Title);
+
+        //    return true;
+        //}
 
         public bool IsFormOpen(string formUID)
         {
