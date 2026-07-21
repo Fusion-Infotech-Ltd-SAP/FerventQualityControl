@@ -12,24 +12,38 @@ namespace QualityControl.Helper
 
     internal static class AuthorizationService
     {
+        //public static AuthorizationLevel GetAuthorization(string permissionId)
+        //{
+        //    AuthorizationLevel diPermission = GetAuthorizationFromDiUser(permissionId);
+        //    if (diPermission != AuthorizationLevel.None)
+        //        return diPermission;
+
+        //    try
+        //    {
+        //        dynamic company = Global.G_UI_Application.Company;
+        //        object permission = company.GetPermission(permissionId);
+        //        return ConvertPermission(permission);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return AuthorizationLevel.None;
+        //    }
+        //}
+
         public static AuthorizationLevel GetAuthorization(string permissionId)
         {
-            AuthorizationLevel diPermission = GetAuthorizationFromDiUser(permissionId);
-            if (diPermission != AuthorizationLevel.None)
-                return diPermission;
-
             try
             {
-                dynamic company = Global.G_UI_Application.Company;
-                object permission = company.GetPermission(permissionId);
-                return ConvertPermission(permission);
+                return GetAuthorizationFromDiUser(permissionId);
             }
-            catch
+            catch (Exception ex)
             {
+                Global.GFunc.ShowError(
+                    "Permission check error: " + ex.Message);
+
                 return AuthorizationLevel.None;
             }
         }
-
         private static AuthorizationLevel GetAuthorizationFromDiUser(string permissionId)
         {
             SAPbobsCOM.Users user = null;
@@ -113,7 +127,7 @@ namespace QualityControl.Helper
             if (CanView(permissionId))
                 return true;
 
-            ShowNoAuthorization(actionName);
+            ShowNoAuthorization(permissionId, actionName);
             return false;
         }
 
@@ -122,13 +136,29 @@ namespace QualityControl.Helper
             if (CanFull(permissionId))
                 return true;
 
-            ShowNoAuthorization(actionName);
+            ShowNoAuthorization(permissionId, actionName);
             return false;
         }
 
-        private static void ShowNoAuthorization(string actionName)
+        //private static void ShowNoAuthorization(string actionName)
+        //{
+        //    Global.GFunc.ShowError("No authorization for " + actionName + ".");
+        //}
+
+        private static void ShowNoAuthorization(string permissionId, string actionName)
         {
-            Global.GFunc.ShowError("No authorization for " + actionName + ".");
+            AuthorizationLevel level = GetAuthorization(permissionId);
+
+            string mode = "No Authorization";
+
+            if (level == AuthorizationLevel.Full)
+                mode = "Full";
+            else if (level == AuthorizationLevel.ReadOnly)
+                mode = "Read Only";
+
+            Global.GFunc.ShowError(
+                "No authorization for " + actionName +
+                ". Current Permission Mode: " + mode);
         }
     }
 }

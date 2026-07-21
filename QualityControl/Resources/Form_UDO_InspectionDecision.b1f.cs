@@ -709,8 +709,12 @@ namespace QualityControl.Resources
 
         private void BTSTKTRNS_PressedAfter(object sboObject, SAPbouiCOM.SBOItemEventArg pVal)
         {
+            
             SAPbobsCOM.Company oCompany = Global.oComp;
             SAPbouiCOM.Form oForm = Application.SBO_Application.Forms.Item("FIL_FRM_DH_INSPDECN");
+
+            if (!AuthorizationService.EnsureFull(FormAuthorizationHelper.GetPermissionByForm(oForm.UniqueID), oForm.Title))
+                return;
 
             bool success = false;
 
